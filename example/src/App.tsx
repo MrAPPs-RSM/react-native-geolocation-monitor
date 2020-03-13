@@ -1,15 +1,22 @@
 import * as React from 'react';
-import {StyleSheet, View, Text, EmitterSubscription} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  EmitterSubscription,
+  PermissionsAndroid,
+} from 'react-native';
 import {
   GeolocationMonitor,
   GeolocationNativeEventEmitter,
   Location,
-  PositionError
+  PositionError,
 } from 'react-native-geolocation-monitor';
 
 export default function App() {
   const [currentLocation, setCurrentLocation] = React.useState('searching...');
-  const geolocationMonitorEmitter = new GeolocationNativeEventEmitter().geolocationMonitorEmitter;
+  const geolocationMonitorEmitter = new GeolocationNativeEventEmitter()
+    .geolocationMonitorEmitter;
   let subscription: EmitterSubscription | null = null;
   let errorSubscription: EmitterSubscription | null = null;
 
@@ -24,10 +31,8 @@ export default function App() {
     //
     subscription = geolocationMonitorEmitter.addListener(
       'LocationUpdated',
-      (location) => setCurrentLocation(JSON.stringify(location))
+      location => setCurrentLocation(JSON.stringify(location))
     );
-
-
 
     // LocationUpdated event
     // callback LocationErrorCallback
@@ -41,7 +46,8 @@ export default function App() {
 
     GeolocationMonitor.getCurrentLocation((location: Location) => {
       setCurrentLocation(JSON.stringify(location));
-    });  }, []);
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
