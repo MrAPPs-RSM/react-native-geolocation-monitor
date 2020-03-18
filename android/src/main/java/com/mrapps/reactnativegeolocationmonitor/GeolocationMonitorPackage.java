@@ -1,4 +1,4 @@
-package com.reactnativegeolocationmonitor;
+package com.mrapps.reactnativegeolocationmonitor;
 
 import java.util.Arrays;
 import java.util.Collections;

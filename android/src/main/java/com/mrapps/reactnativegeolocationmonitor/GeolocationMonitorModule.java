@@ -1,4 +1,4 @@
-package com.reactnativegeolocationmonitor;
+package com.mrapps.reactnativegeolocationmonitor;
 
 import android.Manifest;
 import android.app.Activity;
@@ -131,8 +131,10 @@ public class GeolocationMonitorModule extends ReactContextBaseJavaModule impleme
 
     @ReactMethod
     public void stopTracking() {
-      mGpsService.stopTracking();
-      mGpsService = null;
+      if (mGpsService != null) {
+        mGpsService.stopTracking();
+        mGpsService = null;
+      }
     }
 
   @ReactMethod

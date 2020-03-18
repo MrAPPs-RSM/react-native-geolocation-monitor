@@ -1,4 +1,4 @@
-package com.reactnativegeolocationmonitor;
+package com.mrapps.reactnativegeolocationmonitor;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
