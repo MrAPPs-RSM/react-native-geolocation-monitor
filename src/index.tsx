@@ -30,5 +30,3 @@ export class GeolocationNativeEventEmitter {
     this.geolocationMonitorEmitter =  new NativeEventEmitter(GeolocationMonitor);
   }
 }
-
-

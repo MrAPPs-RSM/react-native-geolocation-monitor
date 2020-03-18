@@ -44,10 +44,13 @@ export default function App() {
     //To receive only first location found
     // getCurrentLocation((location) => {})
 
+    /*
     GeolocationMonitor.getCurrentLocation((location: Location) => {
       setCurrentLocation(JSON.stringify(location));
     });
+     */
   }, []);
+
 
   return (
     <View style={styles.container}>

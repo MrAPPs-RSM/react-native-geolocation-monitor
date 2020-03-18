@@ -9,12 +9,11 @@ Pod::Spec.new do |s|
   s.homepage     = package["homepage"]
   s.license      = package["license"]
   s.authors      = package["author"]
-
+  s.swift_version = '4.2'
+  s.framework = 'Foundation'
   s.platforms    = { :ios => "11.0" }
   s.source       = { :git => "https://github.com/MrAPPs-RSM/react-native-geolocation-monitor.git", :tag => "#{s.version}" }
-
-  s.source_files = "ios/**/*.{h,m}"
+  s.source_files = "ios/**/*.{h,m,swift}"
 
   s.dependency "React"
-  s.dependency 'INTULocationManager', '4.3.2'
 end
