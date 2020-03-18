@@ -17,7 +17,7 @@
     "test": "jest",
     "typescript": "tsc --noEmit",
     "lint": "eslint --ext .js,.ts,.tsx .",
-    "prepare": "bob build",
+    "prepare-bob": "bob build",
     "release": "release-it",
     "example": "yarn --cwd example",
     "pods": "cd example/ios && node -e \"process.exit(require('os').platform() === 'darwin')\" || pod install",

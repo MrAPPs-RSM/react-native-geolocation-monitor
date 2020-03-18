@@ -1,4 +1,4 @@
-package com.reactnativegeolocationmonitor;
+package com.mrapps.reactnativegeolocationmonitor;
 
 public enum LocationError {
 
