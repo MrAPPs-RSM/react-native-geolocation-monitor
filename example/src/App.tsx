@@ -48,6 +48,7 @@ export default function App() {
     GeolocationMonitor.getCurrentLocation((location: Location) => {
       setCurrentLocation(JSON.stringify(location));
     });
+
      */
   }, []);
 

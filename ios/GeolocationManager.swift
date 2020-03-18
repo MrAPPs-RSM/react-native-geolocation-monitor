@@ -21,7 +21,6 @@ struct GeolocationError {
 class GeolocationManager: NSObject,CLLocationManagerDelegate {
 	var minAccuracyMeters: CLLocationAccuracy = 500
 	var manager:CLLocationManager = CLLocationManager()
-	var isTracking: Bool = false
 
 	static let shared = GeolocationManager()
 
@@ -73,10 +72,7 @@ class GeolocationManager: NSObject,CLLocationManagerDelegate {
 
 	func stopGeolocationRequest(){
 		manager.delegate = nil
-		isTracking = false
-		if(isTracking){
-			manager.stopUpdatingLocation()
-		}
+		manager.stopUpdatingLocation()
 	}
 
 
@@ -89,13 +85,11 @@ class GeolocationManager: NSObject,CLLocationManagerDelegate {
 			break;
 		default:
 			if(self.askForAuthorizations(status)){
-				if(!isTracking){
-					isTracking = true
 					manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+				    manager.pausesLocationUpdatesAutomatically = false
 					manager.allowsBackgroundLocationUpdates = true
 					manager.showsBackgroundLocationIndicator = true
 					manager.startUpdatingLocation()
-				}
 			}
 		}
 	}
