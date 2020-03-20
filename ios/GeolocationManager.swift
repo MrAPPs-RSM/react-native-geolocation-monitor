@@ -19,7 +19,8 @@ struct GeolocationError {
 }
 
 class GeolocationManager: NSObject,CLLocationManagerDelegate {
-	var minAccuracyMeters: CLLocationAccuracy = 500
+	let minAccuracyMeters: CLLocationAccuracy = 500
+	let distanceFilter: CLLocationDistance = 1000
 	var manager:CLLocationManager = CLLocationManager()
 
 	static let shared = GeolocationManager()
@@ -62,7 +63,7 @@ class GeolocationManager: NSObject,CLLocationManagerDelegate {
 
 	func startGeolocationRequest(_ locationCallback: @escaping (CLLocation) -> (),errorCallback: @escaping (GeolocationError) -> ()){
 		manager.delegate = self
-		manager.distanceFilter = minAccuracyMeters
+		manager.distanceFilter = distanceFilter
 		self.locationCallback = locationCallback
 		self.errorCallback = errorCallback
 		if(self.isGeolocationSupportedAndEnabled()){
@@ -86,7 +87,7 @@ class GeolocationManager: NSObject,CLLocationManagerDelegate {
 		default:
 			if(self.askForAuthorizations(status)){
 					manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-				    manager.pausesLocationUpdatesAutomatically = false
+				    manager.pausesLocationUpdatesAutomatically = true
 					manager.allowsBackgroundLocationUpdates = true
 					manager.showsBackgroundLocationIndicator = true
 					manager.startUpdatingLocation()
