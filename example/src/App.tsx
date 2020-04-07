@@ -5,6 +5,7 @@ import {
   Text,
   EmitterSubscription,
   PermissionsAndroid,
+  TouchableOpacity
 } from 'react-native';
 import {
   GeolocationMonitor,
@@ -24,7 +25,7 @@ export default function App() {
     //To receive Location update until you stop
     // startTracking() | stopTracking()
 
-    GeolocationMonitor.startTracking();
+    //GeolocationMonitor.startTracking();
 
     // LocationUpdated event
     // callback LocationChangedCallback
@@ -52,10 +53,20 @@ export default function App() {
      */
   }, []);
 
+  const onStartPress = () => GeolocationMonitor.startTracking();
+  const onStopPress = () => GeolocationMonitor.stopTracking();
 
   return (
     <View style={styles.container}>
-      <Text>Current Location: {currentLocation}</Text>
+      <View style={styles.content}>
+        <Text>Current Location: {currentLocation}</Text>
+        <TouchableOpacity style={styles.button} onPress={onStartPress}>
+          <Text style={styles.buttonTitle}>Start</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={onStopPress}>
+          <Text style={styles.buttonTitle}>Stop</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -66,4 +77,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  content: {
+    padding: 32,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  button: {
+    marginTop: 20,
+    width: 200,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "red"
+  },
+  buttonTitle: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold"
+  },
+  stop: {
+    marginTop: 16
+  }
 });

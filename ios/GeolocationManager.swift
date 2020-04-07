@@ -69,6 +69,7 @@ class GeolocationManager: NSObject,CLLocationManagerDelegate {
 		if(self.isGeolocationSupportedAndEnabled()){
 			manager.requestAlwaysAuthorization()
 		}
+        manager.startUpdatingLocation()
 	}
 
 	func stopGeolocationRequest(){
