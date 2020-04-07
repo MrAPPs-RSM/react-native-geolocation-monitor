@@ -29,15 +29,14 @@ import java.util.Objects;
 
 public class GeolocationMonitorModule extends ReactContextBaseJavaModule implements BackgroundLocationService.LocationMonitorListener {
 
-  private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 123;
   private final ReactApplicationContext mReactContext;
-    private BackgroundLocationService mGpsService;
+  private BackgroundLocationService mGpsService;
 
-    private Location lastLocation;
-    private Callback lastLocationCallback;
-    private boolean onlyOnce;
-    private boolean startTrackingRequested;
-    private boolean initializing;
+  private Location lastLocation;
+  private Callback lastLocationCallback;
+  private boolean onlyOnce;
+  private boolean startTrackingRequested;
+  private boolean initializing;
 
 
   public GeolocationMonitorModule(ReactApplicationContext reactContext) {
@@ -46,7 +45,7 @@ public class GeolocationMonitorModule extends ReactContextBaseJavaModule impleme
 
     this.initializing = false;
     this.onlyOnce = false;
-    this.startTrackingRequested = false;
+    this.startTrackingRequested = true;
   }
 
   private void init() {
@@ -58,27 +57,28 @@ public class GeolocationMonitorModule extends ReactContextBaseJavaModule impleme
     }
   }
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            String name = className.getClassName();
-            if (name.endsWith("BackgroundLocationService")) {
-                mGpsService = ((BackgroundLocationService.LocationServiceBinder) service).getService();
-                initializing = false;
-                if(startTrackingRequested){
-                  startTrackingRequested = false;
-                  mGpsService.startTracking();
-                }
-            }
+  private ServiceConnection serviceConnection = new ServiceConnection() {
+    public void onServiceConnected(ComponentName className, IBinder service) {
+      String name = className.getClassName();
+      if (name.endsWith("BackgroundLocationService")) {
+        mGpsService = ((BackgroundLocationService.LocationServiceBinder) service).getService();
+        mGpsService.setLocationListener(GeolocationMonitorModule.this);
+        initializing = false;
+        if (startTrackingRequested) {
+          startTrackingRequested = false;
+          mGpsService.startTracking();
         }
+      }
+    }
 
-        public void onServiceDisconnected(ComponentName className) {
-            if (className.getClassName().equals("BackgroundLocationService")) {
-                mGpsService = null;
-                initializing = false;
-                //TODO: verify if restart is needed
-            }
-        }
-    };
+    public void onServiceDisconnected(ComponentName className) {
+      if (className.getClassName().equals("BackgroundLocationService")) {
+        mGpsService = null;
+        initializing = false;
+        //TODO: verify if restart is needed
+      }
+    }
+  };
 
   private void sendEvent(String eventName,
                          @Nullable WritableMap params) {
@@ -87,55 +87,54 @@ public class GeolocationMonitorModule extends ReactContextBaseJavaModule impleme
       .emit(eventName, params);
   }
 
-    @Override
-    public String getName() {
-        return "GeolocationMonitor";
-    }
+  @Override
+  public String getName() {
+    return "GeolocationMonitor";
+  }
 
-    private HashMap<String, Double> mapLocation(Location location){
-      HashMap<String, Double> mappedLocation = new HashMap<>();
-      mappedLocation.put("latitude", location.getLatitude());
-      mappedLocation.put("longitude", location.getLongitude());
-      return mappedLocation;
-    }
+  private HashMap<String, Double> mapLocation(Location location) {
+    HashMap<String, Double> mappedLocation = new HashMap<>();
+    mappedLocation.put("latitude", location.getLatitude());
+    mappedLocation.put("longitude", location.getLongitude());
+    return mappedLocation;
+  }
 
-    private void startTrackingOnlyOnce(boolean onlyOnce)
-    {
-      this.onlyOnce = onlyOnce;
-      // Check for permission
-      if (LocationUtils.hasLocationPermission(mReactContext)) {
+  private void startTrackingOnlyOnce(boolean onlyOnce) {
+    this.onlyOnce = onlyOnce;
+    // Check for permission
+    if (LocationUtils.hasLocationPermission(mReactContext)) {
 
-        if(mGpsService == null){
-            this.init();
-        }
-
-      } else if (!LocationUtils.isLocationEnabled(mReactContext)) {
-        WritableMap params = Arguments.createMap();
-        params.putInt("code", LocationError.LOCATION_NOT_ENABLED.getValue());
-        params.putString("message", "geolocation_android_permissions_denied");
-        sendEvent("LocationError", params);
-      } else {
-
-
-        WritableMap params = Arguments.createMap();
-        params.putInt("code", LocationError.PERMISSIONS_DENIED.getValue());
-        params.putString("message", "geolocation_android_permissions_denied");
-        sendEvent("LocationError", params);
+      if (mGpsService == null) {
+        this.init();
       }
-    }
 
-    @ReactMethod
-    public void startTracking() {
-      this.startTrackingOnlyOnce(false);
-    }
+    } else if (!LocationUtils.isLocationEnabled(mReactContext)) {
+      WritableMap params = Arguments.createMap();
+      params.putInt("code", LocationError.LOCATION_NOT_ENABLED.getValue());
+      params.putString("message", "geolocation_android_permissions_denied");
+      sendEvent("LocationError", params);
+    } else {
 
-    @ReactMethod
-    public void stopTracking() {
-      if (mGpsService != null) {
-        mGpsService.stopTracking();
-        mGpsService = null;
-      }
+
+      WritableMap params = Arguments.createMap();
+      params.putInt("code", LocationError.PERMISSIONS_DENIED.getValue());
+      params.putString("message", "geolocation_android_permissions_denied");
+      sendEvent("LocationError", params);
     }
+  }
+
+  @ReactMethod
+  public void startTracking() {
+    this.startTrackingOnlyOnce(false);
+  }
+
+  @ReactMethod
+  public void stopTracking() {
+    if (mGpsService != null) {
+      mGpsService.stopTracking();
+      mGpsService = null;
+    }
+  }
 
   @ReactMethod
   public void getCurrentLocation(Callback callback) {
@@ -146,30 +145,35 @@ public class GeolocationMonitorModule extends ReactContextBaseJavaModule impleme
     }
   }
 
-    @Override
-    public void onLocationChanged(Location location) {
+  @Override
+  public void onLocationChanged(Location location) {
 
     this.lastLocation = location;
 
-     if(onlyOnce){
-       this.stopTracking();
-     }
+    if (onlyOnce) {
+      this.stopTracking();
+    }
 
-     if(this.lastLocationCallback != null){
+    if (this.lastLocationCallback != null) {
       this.lastLocationCallback.invoke(this.mapLocation(this.lastLocation));
       this.lastLocationCallback = null;
-     }
-    }
-
-    @Override
-    public void onReady() {
-    }
-
-    @Override
-    public void onError(int code, String errorMessage) {
+    } else if (!onlyOnce) {
       WritableMap params = Arguments.createMap();
-      params.putInt("code", code);
-      params.putString("message", errorMessage);
-      sendEvent("LocationError", params);
+      params.putString("latitude", String.valueOf(location.getLatitude()));
+      params.putString("longitude", String.valueOf(location.getLongitude()));
+      sendEvent("LocationUpdated", params);
     }
+  }
+
+  @Override
+  public void onReady() {
+  }
+
+  @Override
+  public void onError(int code, String errorMessage) {
+    WritableMap params = Arguments.createMap();
+    params.putInt("code", code);
+    params.putString("message", errorMessage);
+    sendEvent("LocationError", params);
+  }
 }
