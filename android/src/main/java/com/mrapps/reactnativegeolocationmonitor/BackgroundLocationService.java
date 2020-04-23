@@ -38,8 +38,8 @@ public class BackgroundLocationService extends Service {
     void onError(int code, String error);
   }
 
-  private final int LOCATION_INTERVAL = 500;
-  private final int LOCATION_DISTANCE = 10;
+  private final int LOCATION_INTERVAL = 1000;
+  private final int LOCATION_DISTANCE = 500;
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -95,6 +95,7 @@ public class BackgroundLocationService extends Service {
   @Override
   public void onDestroy() {
     super.onDestroy();
+
     if (mLocationManager != null) {
       try {
         mLocationManager.removeUpdates(mLocationListener);

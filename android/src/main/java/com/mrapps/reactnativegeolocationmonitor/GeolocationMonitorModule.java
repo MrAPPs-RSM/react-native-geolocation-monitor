@@ -1,20 +1,16 @@
 package com.mrapps.reactnativegeolocationmonitor;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.os.IBinder;
-import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
@@ -22,12 +18,9 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
-import com.mrapps.reactnativegeolocationmonitor.R;
-
 import java.util.HashMap;
-import java.util.Objects;
 
-public class GeolocationMonitorModule extends ReactContextBaseJavaModule implements BackgroundLocationService.LocationMonitorListener {
+public class GeolocationMonitorModule extends ReactContextBaseJavaModule implements BackgroundLocationService.LocationMonitorListener, LifecycleEventListener {
 
   private final ReactApplicationContext mReactContext;
   private BackgroundLocationService mGpsService;
@@ -42,7 +35,7 @@ public class GeolocationMonitorModule extends ReactContextBaseJavaModule impleme
   public GeolocationMonitorModule(ReactApplicationContext reactContext) {
     super(reactContext);
     mReactContext = reactContext;
-
+    mReactContext.addLifecycleEventListener(this);
     this.initializing = false;
     this.onlyOnce = false;
     this.startTrackingRequested = true;
@@ -175,5 +168,23 @@ public class GeolocationMonitorModule extends ReactContextBaseJavaModule impleme
     params.putInt("code", code);
     params.putString("message", errorMessage);
     sendEvent("LocationError", params);
+  }
+
+  @Override
+  public void onHostResume() {
+
+  }
+
+  @Override
+  public void onHostPause() {
+
+  }
+
+  @Override
+  public void onHostDestroy() {
+
+    final Intent intent = new Intent(mReactContext, BackgroundLocationService.class);
+    mReactContext.stopService(intent);
+    mReactContext.unbindService(serviceConnection);
   }
 }
